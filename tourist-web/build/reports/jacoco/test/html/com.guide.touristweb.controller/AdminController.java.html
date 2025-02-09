@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="pl"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AdminController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">tourist-web</a> &gt; <a href="index.source.html" class="el_package">com.guide.touristweb.controller</a> &gt; <span class="el_source">AdminController.java</span></div><h1>AdminController.java</h1><pre class="source lang-java linenums">package com.guide.touristweb.controller;
+
+import com.guide.touristmodel.entity.Attraction;
+import com.guide.touristmodel.entity.Destination;
+import com.guide.touristrepository.repository.AttractionRepository;
+import com.guide.touristrepository.repository.DestinationRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
+
+@Controller
+@RequestMapping(&quot;/admin&quot;)
+<span class="fc" id="L15">@RequiredArgsConstructor</span>
+public class AdminController {
+
+    private final DestinationRepository destinationRepo;
+    private final AttractionRepository attractionRepo;
+
+    @GetMapping(&quot;/destinations&quot;)
+    public String destinationsList(Model model) {
+<span class="nc" id="L23">        model.addAttribute(&quot;destinations&quot;, destinationRepo.findAll());</span>
+<span class="nc" id="L24">        return &quot;adminDestinations&quot;;</span>
+    }
+
+    @GetMapping(&quot;/destinations/delete&quot;)
+    @Transactional
+    public String deleteDestination(@RequestParam(&quot;destId&quot;) Long destId, Model model) {
+<span class="nc" id="L30">        var dest = destinationRepo.findById(destId).orElse(null);</span>
+<span class="nc bnc" id="L31" title="All 2 branches missed.">        if (dest == null) {</span>
+<span class="nc" id="L32">            model.addAttribute(&quot;error&quot;, &quot;Destination not found.&quot;);</span>
+<span class="nc" id="L33">            return &quot;redirect:/admin/destinations&quot;;</span>
+        }
+<span class="nc" id="L35">        destinationRepo.delete(dest);</span>
+<span class="nc" id="L36">        return &quot;redirect:/admin/destinations&quot;;</span>
+    }
+
+
+    @GetMapping(&quot;/attractions/form&quot;)
+    public String showAttractionForm(@RequestParam(value = &quot;attrId&quot;, required = false) Long attrId,
+                                     @RequestParam(value = &quot;destId&quot;, required = false) Long destId,
+                                     Model model) {
+        Attraction attraction;
+        Destination destination;
+<span class="nc" id="L46">        boolean editMode = false;</span>
+
+<span class="nc bnc" id="L48" title="All 2 branches missed.">        if (attrId != null) {</span>
+<span class="nc" id="L49">            attraction = attractionRepo.findById(attrId).orElse(null);</span>
+<span class="nc bnc" id="L50" title="All 2 branches missed.">            if (attraction == null) {</span>
+<span class="nc" id="L51">                model.addAttribute(&quot;error&quot;, &quot;Attraction not found.&quot;);</span>
+<span class="nc" id="L52">                return &quot;redirect:/admin/destinations&quot;;</span>
+            }
+<span class="nc" id="L54">            destination = attraction.getDestination();</span>
+<span class="nc" id="L55">            editMode = true;</span>
+        } else {
+<span class="nc bnc" id="L57" title="All 2 branches missed.">            if (destId == null) {</span>
+<span class="nc" id="L58">                model.addAttribute(&quot;error&quot;, &quot;Destination ID is required for adding a new attraction.&quot;);</span>
+<span class="nc" id="L59">                return &quot;redirect:/admin/destinations&quot;;</span>
+            }
+<span class="nc" id="L61">            destination = destinationRepo.findById(destId).orElse(null);</span>
+<span class="nc bnc" id="L62" title="All 2 branches missed.">            if (destination == null) {</span>
+<span class="nc" id="L63">                model.addAttribute(&quot;error&quot;, &quot;Destination not found.&quot;);</span>
+<span class="nc" id="L64">                return &quot;redirect:/admin/destinations&quot;;</span>
+            }
+<span class="nc" id="L66">            attraction = new Attraction();</span>
+<span class="nc" id="L67">            attraction.setDestination(destination);</span>
+        }
+
+<span class="nc" id="L70">        model.addAttribute(&quot;attraction&quot;, attraction);</span>
+<span class="nc" id="L71">        model.addAttribute(&quot;destination&quot;, destination);</span>
+<span class="nc" id="L72">        model.addAttribute(&quot;editMode&quot;, editMode);</span>
+
+<span class="nc" id="L74">        return &quot;adminAttractionForm&quot;;</span>
+    }
+
+
+    @PostMapping(&quot;/attractions/save&quot;)
+    @Transactional
+    public String saveAttraction(@ModelAttribute(&quot;attraction&quot;) Attraction formAttraction,
+                                 @RequestParam(value = &quot;editMode&quot;, defaultValue = &quot;false&quot;) boolean editMode,
+                                 Model model) {
+<span class="nc bnc" id="L83" title="All 4 branches missed.">        if (formAttraction.getName() == null || formAttraction.getName().trim().isEmpty()) {</span>
+<span class="nc" id="L84">            model.addAttribute(&quot;error&quot;, &quot;Name is required.&quot;);</span>
+<span class="nc" id="L85">            model.addAttribute(&quot;editMode&quot;, editMode);</span>
+<span class="nc" id="L86">            model.addAttribute(&quot;attraction&quot;, formAttraction);</span>
+<span class="nc" id="L87">            model.addAttribute(&quot;destination&quot;, formAttraction.getDestination());</span>
+<span class="nc" id="L88">            return &quot;adminAttractionForm&quot;;</span>
+        }
+
+<span class="nc bnc" id="L91" title="All 2 branches missed.">        if (editMode) {</span>
+<span class="nc" id="L92">            Attraction existing = attractionRepo.findById(formAttraction.getId()).orElse(null);</span>
+<span class="nc bnc" id="L93" title="All 2 branches missed.">            if (existing == null) {</span>
+<span class="nc" id="L94">                model.addAttribute(&quot;error&quot;, &quot;Attraction not found for editing.&quot;);</span>
+<span class="nc" id="L95">                return &quot;redirect:/admin/destinations&quot;;</span>
+            }
+<span class="nc" id="L97">            existing.setName(formAttraction.getName());</span>
+<span class="nc" id="L98">            existing.setSlug(formAttraction.getSlug());</span>
+<span class="nc" id="L99">            existing.setDescription(formAttraction.getDescription());</span>
+<span class="nc" id="L100">            existing.setPhotoUrl(formAttraction.getPhotoUrl());</span>
+<span class="nc" id="L101">            existing.setPrice(formAttraction.getPrice());</span>
+<span class="nc" id="L102">            existing.setCurrency(formAttraction.getCurrency());</span>
+<span class="nc" id="L103">            existing.setLat(formAttraction.getLat());</span>
+<span class="nc" id="L104">            existing.setLng(formAttraction.getLng());</span>
+
+<span class="nc" id="L106">            attractionRepo.save(existing);</span>
+
+<span class="nc" id="L108">        } else {</span>
+<span class="nc" id="L109">            var destId = formAttraction.getDestination().getId();</span>
+<span class="nc" id="L110">            Destination dest = destinationRepo.findById(destId).orElse(null);</span>
+<span class="nc bnc" id="L111" title="All 2 branches missed.">            if (dest == null) {</span>
+<span class="nc" id="L112">                model.addAttribute(&quot;error&quot;, &quot;Destination not found.&quot;);</span>
+<span class="nc" id="L113">                return &quot;redirect:/admin/destinations&quot;;</span>
+            }
+<span class="nc" id="L115">            formAttraction.setDestination(dest);</span>
+<span class="nc" id="L116">            attractionRepo.save(formAttraction);</span>
+        }
+
+<span class="nc" id="L119">        return &quot;redirect:/admin/destinations&quot;;</span>
+    }
+
+
+    @GetMapping(&quot;/attractions/delete&quot;)
+    @Transactional
+    public String deleteAttraction(@RequestParam(&quot;attrId&quot;) Long attrId, Model model) {
+<span class="nc" id="L126">        var attr = attractionRepo.findById(attrId).orElse(null);</span>
+<span class="nc bnc" id="L127" title="All 2 branches missed.">        if (attr == null) {</span>
+<span class="nc" id="L128">            model.addAttribute(&quot;error&quot;, &quot;Attraction not found.&quot;);</span>
+<span class="nc" id="L129">            return &quot;redirect:/admin/destinations&quot;;</span>
+        }
+<span class="nc" id="L131">        attractionRepo.delete(attr);</span>
+<span class="nc" id="L132">        return &quot;redirect:/admin/destinations&quot;;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

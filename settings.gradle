@@ -1,0 +1,6 @@
+rootProject.name = 'TouristGuide'
+include 'tourist-model'
+include 'tourist-repository'
+include 'tourist-service'
+include 'tourist-web'
+

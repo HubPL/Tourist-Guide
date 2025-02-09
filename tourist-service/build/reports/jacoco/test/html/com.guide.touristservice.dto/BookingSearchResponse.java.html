@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="pl"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>BookingSearchResponse.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">tourist-service</a> &gt; <a href="index.source.html" class="el_package">com.guide.touristservice.dto</a> &gt; <span class="el_source">BookingSearchResponse.java</span></div><h1>BookingSearchResponse.java</h1><pre class="source lang-java linenums">package com.guide.touristservice.dto;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Data;
+
+import java.util.List;
+
+
+<span class="nc bnc" id="L10" title="All 26 branches missed.">@Data</span>
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class BookingSearchResponse {
+
+<span class="nc" id="L14">    private DataInner data;</span>
+<span class="nc" id="L15">    private boolean status;</span>
+<span class="nc" id="L16">    private String message;</span>
+
+<span class="nc bnc" id="L18" title="All 14 branches missed.">    @Data</span>
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class DataInner {
+<span class="nc" id="L21">        private List&lt;ProductItem&gt; products;</span>
+
+    }
+
+<span class="nc bnc" id="L25" title="All 70 branches missed.">    @Data</span>
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class ProductItem {
+
+<span class="nc" id="L29">        private String id;</span>
+<span class="nc" id="L30">        private String name;</span>
+<span class="nc" id="L31">        private String slug;</span>
+
+<span class="nc" id="L33">        private String shortDescription;</span>
+<span class="nc" id="L34">        private RepresentativePrice representativePrice;</span>
+<span class="nc" id="L35">        private ReviewsStats reviewsStats;</span>
+<span class="nc" id="L36">        private PrimaryPhoto primaryPhoto;</span>
+<span class="nc" id="L37">        private UfiDetails ufiDetails;</span>
+
+<span class="nc bnc" id="L39" title="All 16 branches missed.">        @Data</span>
+        @JsonIgnoreProperties(ignoreUnknown = true)
+        public static class RepresentativePrice {
+<span class="nc" id="L42">            private double publicAmount;</span>
+<span class="nc" id="L43">            private String currency;</span>
+        }
+
+<span class="nc bnc" id="L46" title="All 14 branches missed.">        @Data</span>
+        @JsonIgnoreProperties(ignoreUnknown = true)
+        public static class ReviewsStats {
+<span class="nc" id="L49">            private CombinedNumericStats combinedNumericStats;</span>
+
+<span class="nc bnc" id="L51" title="All 10 branches missed.">            @Data</span>
+            @JsonIgnoreProperties(ignoreUnknown = true)
+            public static class CombinedNumericStats {
+<span class="nc" id="L54">                private double average;</span>
+<span class="nc" id="L55">                private int total;</span>
+            }
+        }
+
+<span class="nc bnc" id="L59" title="All 14 branches missed.">        @Data</span>
+        @JsonIgnoreProperties(ignoreUnknown = true)
+        public static class PrimaryPhoto {
+<span class="nc" id="L62">            private String small;</span>
+        }
+
+<span class="nc bnc" id="L65" title="All 20 branches missed.">        @Data</span>
+        @JsonIgnoreProperties(ignoreUnknown = true)
+        public static class UfiDetails {
+<span class="nc" id="L68">            private long ufi;</span>
+<span class="nc" id="L69">            private double latitude;</span>
+<span class="nc" id="L70">            private double longitude;</span>
+<span class="nc" id="L71">            private String bCityName;</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8"/>
+    <title th:text="'Attractions in ' + ${cityName}">Attractions</title>
+    <link th:href="@{/css/styles.css}" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"/>
+    <script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</head>
+<body>
+<div th:replace="fragments/header :: header"></div>
+
+<div class="container mt-5">
+    <h2 th:text="'Attractions in ' + ${cityName}">Attractions in X</h2>
+
+    <div th:if="${#lists.isEmpty(attractions)}" class="alert alert-info">
+        <p>No attractions found for this city.</p>
+    </div>
+
+    <div class="row row-cols-1 row-cols-md-3 g-4" th:unless="${#lists.isEmpty(attractions)}">
+        <div class="col" th:each="attraction : ${attractions}">
+            <div class="card h-100 attraction-card">
+                <img th:src="${attraction.photoUrl}"
+                     class="card-img-top"
+                     alt="Attraction photo"
+                     style="height: 200px; object-fit: cover;">
+                <div class="card-body">
+                    <h5 class="card-title" th:text="${attraction.name}">[Name]</h5>
+                    <p class="card-text" th:text="${attraction.description}">[Description]</p>
+                    <p>
+                        <strong>Price: </strong>
+                        <span th:text="${attraction.currency + ' ' + #numbers.formatDecimal(attraction.price, 1, 2)}">USD 99</span>
+                    </p>
+                    <p>
+                        <strong>Rating: </strong>
+                        <span th:text="${#numbers.formatDecimal(attraction.reviewsAverage, 1, 1)}">0.0</span>
+                        (<span th:text="${attraction.reviewsTotal}">0</span> reviews)
+                    </p>
+                </div>
+                <div class="card-footer">
+                    <a class="btn btn-sm btn-secondary"
+                       th:href="@{/attraction/details(attrId=${attraction.id})}">
+                        Details
+                    </a>
+                    <a class="btn btn-sm btn-primary"
+                       sec:authorize="isAuthenticated()"
+                       th:href="@{/review/add(attrId=${attraction.id})}">
+                        Add Review
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:replace="fragments/footer :: footer"></div>
+</body>
+</html>

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="pl"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SearchController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">tourist-web</a> &gt; <a href="index.source.html" class="el_package">com.guide.touristweb.controller</a> &gt; <span class="el_source">SearchController.java</span></div><h1>SearchController.java</h1><pre class="source lang-java linenums">package com.guide.touristweb.controller;
+
+import com.guide.touristmodel.entity.Attraction;
+import com.guide.touristmodel.entity.Destination;
+import com.guide.touristservice.services.BookingAttractionService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import java.util.List;
+
+@Controller
+<span class="nc" id="L15">@RequiredArgsConstructor</span>
+public class SearchController {
+
+    private final BookingAttractionService bookingService;
+
+    @GetMapping(&quot;/&quot;)
+    public String home(Model model) {
+<span class="nc" id="L22">        List&lt;Destination&gt; all = bookingService.getSuggestionsFromDb(&quot;&quot;);</span>
+<span class="nc" id="L23">        model.addAttribute(&quot;suggestions&quot;, all);</span>
+<span class="nc" id="L24">        return &quot;home&quot;;</span>
+    }
+
+    @GetMapping(&quot;/search&quot;)
+    public String searchByCity(@RequestParam String city, Model model) {
+<span class="nc" id="L29">        Destination existing = bookingService.getDestinationByNameIgnoreCase(city);</span>
+<span class="nc bnc" id="L30" title="All 2 branches missed.">        if (existing != null) {</span>
+<span class="nc" id="L31">            List&lt;Attraction&gt; attractions = bookingService.importAttractionsForDestination(existing.getId());</span>
+<span class="nc" id="L32">            model.addAttribute(&quot;cityName&quot;, existing.getCityName());</span>
+<span class="nc" id="L33">            model.addAttribute(&quot;attractions&quot;, attractions);</span>
+<span class="nc" id="L34">            return &quot;results&quot;;</span>
+        }
+
+<span class="nc" id="L37">        List&lt;Destination&gt; newlySaved = bookingService.importAllDestinationsFromAutocomplete(city);</span>
+<span class="nc bnc" id="L38" title="All 4 branches missed.">        if (newlySaved == null || newlySaved.isEmpty()) {</span>
+<span class="nc" id="L39">            model.addAttribute(&quot;message&quot;, &quot;No destinations found for: &quot; + city);</span>
+<span class="nc" id="L40">            return &quot;error&quot;;</span>
+<span class="nc bnc" id="L41" title="All 2 branches missed.">        } else if (newlySaved.size() == 1) {</span>
+<span class="nc" id="L42">            Destination single = newlySaved.get(0);</span>
+<span class="nc" id="L43">            List&lt;Attraction&gt; attractions = bookingService.importAttractionsForDestination(single.getId());</span>
+<span class="nc" id="L44">            model.addAttribute(&quot;cityName&quot;, single.getCityName());</span>
+<span class="nc" id="L45">            model.addAttribute(&quot;attractions&quot;, attractions);</span>
+<span class="nc" id="L46">            return &quot;results&quot;;</span>
+        } else {
+<span class="nc" id="L48">            model.addAttribute(&quot;destinations&quot;, newlySaved);</span>
+<span class="nc" id="L49">            return &quot;chooseDestination&quot;;</span>
+        }
+    }
+
+    @GetMapping(&quot;/pickDestination&quot;)
+    public String pickDestination(@RequestParam(&quot;id&quot;) Long id, Model model) {
+<span class="nc" id="L55">        Destination d = bookingService.getDestinationById(id);</span>
+<span class="nc bnc" id="L56" title="All 2 branches missed.">        if (d == null) {</span>
+<span class="nc" id="L57">            model.addAttribute(&quot;message&quot;, &quot;Destination not found for ID: &quot; + id);</span>
+<span class="nc" id="L58">            return &quot;error&quot;;</span>
+        }
+<span class="nc" id="L60">        List&lt;Attraction&gt; attractions = bookingService.importAttractionsForDestination(d.getId());</span>
+<span class="nc" id="L61">        model.addAttribute(&quot;cityName&quot;, d.getCityName());</span>
+<span class="nc" id="L62">        model.addAttribute(&quot;attractions&quot;, attractions);</span>
+<span class="nc" id="L63">        return &quot;results&quot;;</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

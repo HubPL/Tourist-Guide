@@ -1,0 +1,38 @@
+plugins {
+    id 'org.springframework.boot' version '3.1.4'
+    id 'io.spring.dependency-management' version '1.1.3'
+}
+
+subprojects {
+    apply plugin: 'java'
+    // UWAGA: 'groovy' plugin jest inny niż Groovy DSL w build.gradle;
+    // Tylko dodaj "apply plugin: 'groovy'" jeśli naprawdę używasz Groovy do pisania testów/kodu.
+    // Na razie wystarczy 'java'.
+
+    group = 'com.example.touristguide'
+    version = '1.0.0-SNAPSHOT'
+    sourceCompatibility = '17'  // lub inna wersja Javy
+
+    apply plugin: 'org.springframework.boot'
+    apply plugin: 'io.spring.dependency-management'
+
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        // Te zależności będą wspólne dla wszystkich subprojektów
+        implementation 'org.springframework.boot:spring-boot-starter'
+        implementation 'org.springframework.boot:spring-boot-starter-web'
+        compileOnly 'org.projectlombok:lombok:1.18.28'
+        annotationProcessor 'org.projectlombok:lombok:1.18.28'
+        implementation 'io.netty:netty-resolver-dns-native-macos:4.1.95.Final:osx-aarch_64'
+
+        // Testy
+        testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    }
+
+    test {
+        useJUnitPlatform()
+    }
+}

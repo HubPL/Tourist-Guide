@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="pl"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>BookingAttractionService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">tourist-service</a> &gt; <a href="index.source.html" class="el_package">com.guide.touristservice.services</a> &gt; <span class="el_source">BookingAttractionService.java</span></div><h1>BookingAttractionService.java</h1><pre class="source lang-java linenums">package com.guide.touristservice.services;
+
+import com.guide.touristmodel.entity.Attraction;
+import com.guide.touristmodel.entity.Destination;
+import com.guide.touristservice.dto.BookingAutoCompleteResponse;
+import com.guide.touristservice.dto.BookingSearchResponse;
+import com.guide.touristservice.integration.BookingApiClient;
+import com.guide.touristrepository.repository.AttractionRepository;
+import com.guide.touristrepository.repository.DestinationRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
+
+@Service
+<span class="nc" id="L19">@RequiredArgsConstructor</span>
+public class BookingAttractionService {
+
+    private final BookingApiClient apiClient;
+    private final DestinationRepository destinationRepo;
+    private final AttractionRepository attractionRepo;
+
+
+    @Cacheable(cacheNames = &quot;destinationsByPrefix&quot;)
+    public List&lt;Destination&gt; getSuggestionsFromDb(String prefix) {
+<span class="nc bnc" id="L29" title="All 4 branches missed.">        if (prefix == null || prefix.isBlank()) {</span>
+<span class="nc" id="L30">            return destinationRepo.findAll();</span>
+        }
+<span class="nc" id="L32">        return destinationRepo.findByCityNameContainingIgnoreCase(prefix);</span>
+    }
+
+    public List&lt;Destination&gt; importAllDestinationsFromAutocomplete(String typed) {
+<span class="nc" id="L36">        BookingAutoCompleteResponse autoResp = apiClient.autoComplete(typed);</span>
+<span class="nc bnc" id="L37" title="All 4 branches missed.">        if (autoResp == null || !autoResp.isStatus()</span>
+<span class="nc bnc" id="L38" title="All 2 branches missed.">                || autoResp.getData() == null</span>
+<span class="nc bnc" id="L39" title="All 2 branches missed.">                || autoResp.getData().getDestinations() == null) {</span>
+<span class="nc" id="L40">            return List.of();</span>
+        }
+<span class="nc" id="L42">        var items = autoResp.getData().getDestinations();</span>
+<span class="nc bnc" id="L43" title="All 2 branches missed.">        if (items.isEmpty()) {</span>
+<span class="nc" id="L44">            return List.of();</span>
+        }
+<span class="nc" id="L46">        List&lt;Destination&gt; savedDestinations = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L47" title="All 2 branches missed.">        for (var item : items) {</span>
+<span class="nc" id="L48">            Destination dest = saveOrUpdateDestination(item);</span>
+<span class="nc" id="L49">            savedDestinations.add(dest);</span>
+<span class="nc" id="L50">        }</span>
+<span class="nc" id="L51">        return savedDestinations;</span>
+    }
+
+    @Transactional
+    public List&lt;Attraction&gt; importAttractionsForDestination(Long destinationId) {
+<span class="nc" id="L56">        Destination d = destinationRepo.findById(destinationId).orElse(null);</span>
+<span class="nc bnc" id="L57" title="All 2 branches missed.">        if (d == null) {</span>
+<span class="nc" id="L58">            return List.of();</span>
+        }
+
+<span class="nc" id="L61">        BookingSearchResponse searchResp = apiClient.searchAttractions(d.getBookingIdBase64());</span>
+<span class="nc" id="L62">        saveSearchResults(d, searchResp);</span>
+
+
+<span class="nc" id="L65">        d = destinationRepo.findById(destinationId).orElse(null);</span>
+<span class="nc bnc" id="L66" title="All 2 branches missed.">        if (d == null) {</span>
+<span class="nc" id="L67">            return List.of();</span>
+        }
+<span class="nc" id="L69">        return d.getAttractions();</span>
+    }
+
+
+    private Destination saveOrUpdateDestination(BookingAutoCompleteResponse.DestinationItem item) {
+<span class="nc" id="L74">        Destination existing = destinationRepo.findByCityName(item.getCityName());</span>
+<span class="nc bnc" id="L75" title="All 2 branches missed.">        if (existing == null) {</span>
+<span class="nc" id="L76">            existing = new Destination();</span>
+<span class="nc" id="L77">            existing.setCityName(item.getCityName());</span>
+        }
+<span class="nc" id="L79">        existing.setCountry(item.getCountry());</span>
+<span class="nc" id="L80">        existing.setBookingIdBase64(item.getId());</span>
+<span class="nc" id="L81">        existing.setUfi(item.getUfi());</span>
+<span class="nc" id="L82">        existing.setProductCount(item.getProductCount());</span>
+
+<span class="nc" id="L84">        return destinationRepo.save(existing);</span>
+    }
+
+    private List&lt;Attraction&gt; saveSearchResults(Destination d, BookingSearchResponse searchResp) {
+<span class="nc bnc" id="L88" title="All 4 branches missed.">        if (!searchResp.isStatus() || searchResp.getData() == null ||</span>
+<span class="nc bnc" id="L89" title="All 2 branches missed.">                searchResp.getData().getProducts() == null) {</span>
+<span class="nc" id="L90">            return List.of();</span>
+        }
+<span class="nc" id="L92">        var products = searchResp.getData().getProducts();</span>
+<span class="nc" id="L93">        List&lt;Attraction&gt; saved = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L94" title="All 2 branches missed.">        for (var p : products) {</span>
+<span class="nc" id="L95">            var existing = attractionRepo.findByBookingProductIdAndDestinationId(p.getId(), d.getId());</span>
+            Attraction a;
+
+<span class="nc bnc" id="L98" title="All 2 branches missed.">            if (existing != null) {</span>
+<span class="nc" id="L99">                a = existing;</span>
+
+
+            } else {
+<span class="nc" id="L103">                a = new Attraction();</span>
+<span class="nc" id="L104">                a.setDestination(d);</span>
+<span class="nc" id="L105">                a.setBookingProductId(p.getId());</span>
+<span class="nc" id="L106">                a.setName(p.getName());</span>
+<span class="nc" id="L107">                a.setSlug(p.getSlug());</span>
+<span class="nc" id="L108">                a.setDescription(p.getShortDescription());</span>
+            }
+
+<span class="nc" id="L111">            var repPrice = p.getRepresentativePrice();</span>
+<span class="nc bnc" id="L112" title="All 2 branches missed.">            if (repPrice != null) {</span>
+<span class="nc" id="L113">                a.setPrice(repPrice.getPublicAmount());</span>
+<span class="nc" id="L114">                a.setCurrency(repPrice.getCurrency());</span>
+            } else {
+<span class="nc" id="L116">                a.setPrice(0.0);</span>
+<span class="nc" id="L117">                a.setCurrency(&quot;USD&quot;);</span>
+            }
+
+<span class="nc bnc" id="L120" title="All 4 branches missed.">            if (p.getReviewsStats() != null &amp;&amp; p.getReviewsStats().getCombinedNumericStats() != null) {</span>
+<span class="nc" id="L121">                a.setReviewsAverage(p.getReviewsStats().getCombinedNumericStats().getAverage());</span>
+<span class="nc" id="L122">                a.setReviewsTotal(p.getReviewsStats().getCombinedNumericStats().getTotal());</span>
+            }
+
+<span class="nc bnc" id="L125" title="All 2 branches missed.">            if (p.getPrimaryPhoto() != null) {</span>
+<span class="nc" id="L126">                a.setPhotoUrl(p.getPrimaryPhoto().getSmall());</span>
+            }
+
+<span class="nc bnc" id="L129" title="All 2 branches missed.">            if (p.getUfiDetails() != null) {</span>
+<span class="nc" id="L130">                a.setLat(p.getUfiDetails().getLatitude());</span>
+<span class="nc" id="L131">                a.setLng(p.getUfiDetails().getLongitude());</span>
+            }
+
+<span class="nc" id="L134">            attractionRepo.save(a);</span>
+<span class="nc" id="L135">            saved.add(a);</span>
+<span class="nc" id="L136">        }</span>
+<span class="nc" id="L137">        return saved;</span>
+    }
+    public Destination getDestinationById(Long id) {
+<span class="nc" id="L140">        return destinationRepo.findById(id).orElse(null);</span>
+    }
+
+    public Destination getDestinationByNameIgnoreCase(String cityName) {
+<span class="nc" id="L144">        return destinationRepo.findByCityNameIgnoreCase(cityName);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>
