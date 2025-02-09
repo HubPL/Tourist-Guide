@@ -1,4 +1,4 @@
-<img width="1710" alt="Zrzut ekranu 2025-02-9 o 18 38 15" src="https://github.com/user-attachments/assets/7b4f34c1-fd4c-4824-a8ae-304505db57ab" /># 🌍 TouristGuide - Odkrywaj Świat! 
+# 🌍 TouristGuide - Odkrywaj Świat! 
 
 ## 🎯 O Projekcie
 TouristGuide to nowoczesna aplikacja webowa stworzona w Spring Boot, która pomaga użytkownikom odkrywać i poznawać atrakcje turystyczne na całym świecie. Aplikacja pobiera aktualne dane z API Booking.com, dzięki czemu użytkownicy mają dostęp do wiarygodnych i aktualnych informacji o miejscach wartych odwiedzenia.
@@ -19,7 +19,7 @@ TouristGuide to nowoczesna aplikacja webowa stworzona w Spring Boot, która poma
 
 ## 📸 Zrzuty Ekranu
 ### Strona główna!
-<img width="1710" alt="Zrzut ekranu 2025-02-9 o 18 39 03" src="https://github.com/user-attachments/assets/6b1ed5ea-087c-43ba-bbfc-0630bc70ba16" />
+<img width="1710" alt="Zrzut ekranu 2025-02-9 o 18 38 15" src="https://github.com/user-attachments/assets/7b4f34c1-fd4c-4824-a8ae-304505db57ab" />
 
 ### Wyszukiwanie Atrakcji
 <img width="1710" alt="Zrzut ekranu 2025-02-9 o 18 39 03" src="https://github.com/user-attachments/assets/a75826b0-052d-4c80-be64-94a5ce18863f" />
