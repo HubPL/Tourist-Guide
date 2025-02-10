@@ -1,7 +1,7 @@
-# 🌍 TouristGuide - Odkrywaj Świat! 
+# 🌍 TouristGuide
 
 ## 🎯 O Projekcie
-TouristGuide to nowoczesna aplikacja webowa stworzona w Spring Boot, która pomaga użytkownikom odkrywać i poznawać atrakcje turystyczne na całym świecie. Aplikacja pobiera aktualne dane z API Booking.com, dzięki czemu użytkownicy mają dostęp do wiarygodnych i aktualnych informacji o miejscach wartych odwiedzenia.
+TouristGuide to aplikacja webowa stworzona w Spring Boot, która pomaga użytkownikom odkrywać i poznawać atrakcje turystyczne na całym świecie. Aplikacja pobiera aktualne dane z API Booking.com, dzięki czemu użytkownicy mają dostęp do wiarygodnych i aktualnych informacji o miejscach wartych odwiedzenia.
 
 ## ✨ Główne Funkcjonalności
 - 🔍 Wyszukiwanie atrakcji turystycznych na całym świecie
